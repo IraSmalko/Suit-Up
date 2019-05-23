@@ -1,40 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:suit_up/models/category.dart';
 
-import 'camera.dart';
+import 'clothing_page.dart';
 
 class ListViewBuilder extends StatefulWidget {
-  List<Category> entries;
+  final List<Category> categories;
 
-  ListViewBuilder(this.entries);
+  ListViewBuilder(this.categories);
 
   @override
-  _ListViewBuilderState createState() => _ListViewBuilderState(entries);
+  _ListViewBuilderState createState() => _ListViewBuilderState(categories);
 }
 
 class _ListViewBuilderState extends State<ListViewBuilder> {
-  List<Category> entries;
+  final List<Category> categories;
 
-  _ListViewBuilderState(this.entries);
+  _ListViewBuilderState(this.categories);
 
   @override
   Widget build(BuildContext context) {
-    final numItems = entries.length;
+    final numItems = categories.length;
 
     Widget _buildRow(int idx) {
       return GestureDetector(
-        onTap: () {
-          CameraPage.startCamera(context, entries[idx].imageUrl);
-        },
+        onTap: () => startClothingPage(context, categories[idx]),
         child: Card(
           child: Row(
             children: <Widget>[
-              Container(height: 80, child: Image.network(entries[idx].imageUrl)),
+              Hero(
+                tag: categories[idx].name,
+                child: Container(
+                  height: 70,
+                  width: 120,
+                  child: Image.asset(categories[idx].imageUrl),
+                ),
+              ),
               Spacer(flex: 1),
               Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Text(
-                  entries[idx].name,
+                  categories[idx].name,
                   style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic, fontSize: 18),
                 ),
               )

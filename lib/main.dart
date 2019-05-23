@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:suit_up/repository/repository.dart';
 import 'package:suit_up/widgets/list_view_builder.dart';
 
 import 'models/category.dart';
@@ -30,32 +32,11 @@ class _BottomTabbarPage extends StatefulWidget {
 
 class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerProviderStateMixin {
   TabController _tabController;
-  static final List<Category> entries = <Category>[
-    Category(
-        "https://media2.newlookassets.com/i/newlook/611091412/womens/clothing/tops/off-white-rolled-sleeve-top.jpg?strip=true&qlt=80&w=720",
-        "T-shirts"),
-    Category(
-        "https://media3.newlookassets.com/i/newlook/630732076/womens/clothing/hoodies-sweatshirts/bright-pink-neon-hoodie.jpg?strip=true&qlt=80&w=720",
-        "Sweaters"),
-    Category(
-        "https://media3.newlookassets.com/i/newlook/605567544M1/womens/clothing/jeans/blue-bleach-wash-super-soft-super-skinny-india-jeans.jpg?strip=true&qlt=80&w=720",
-        "Jeans"),
-    Category(
-        "https://media3.newlookassets.com/i/newlook/618112670M1/womens/clothing/trousers/pink-linen-blend-tapered-trousers.jpg?strip=true&qlt=80&w=720",
-        "Trousers"),
-    Category(
-        "https://media3.newlookassets.com/i/newlook/618913986/womens/clothing/dresses/yellow-herringbone-smock-dress-.jpg?strip=true&qlt=80&w=720",
-        "Dress"),
-    Category(
-        "https://media3.newlookassets.com/i/newlook/606530682M1/womens/clothing/skirts/bright-orange-neon-pleated-midi-skirt-.jpg?strip=true&qlt=80&w=720",
-        "Skirts"),
-    Category(
-        "https://media2.newlookassets.com/i/newlook/618521516/womens/clothing/coats-jackets/stone-twill-double-breasted-blazer-.jpg?strip=true&qlt=80&w=720",
-        "Jackets")
-  ];
+
+  static final List<Category> categories = Repository().categories;
 
   var _kTabPages = <Widget>[
-    Center(child: ListViewBuilder(entries)),
+    Center(child: ListViewBuilder(categories)),
     Center(child: MyHomePage(title: "Suit up")),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
@@ -112,8 +93,8 @@ class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerP
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, @required this.title}) : super(key: key);
 
-  String title;
-  var wordPair = WordPair.random();
+  final String title;
+  final wordPair = WordPair.random();
 
   @override
   _MyHomePageState createState() => _MyHomePageState(title);
@@ -154,7 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Image.network("https://cdn-images-1.medium.com/max/1000/1*JVWWKVOoQ6ZmGFXWN7iRjA.png"),
+                  child: CachedNetworkImage(
+                    height: 80,
+                    width: 80,
+                    imageUrl: "https://cdn-images-1.medium.com/max/1000/1*JVWWKVOoQ6ZmGFXWN7iRjA.png",
+                    placeholder: (q, w) => CircularProgressIndicator(),
+                    errorWidget: (q, w, e) => Text(e.toString()),
+                  ),
                 ),
               ),
               Text(

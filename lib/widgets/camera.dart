@@ -2,23 +2,15 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:pinch_zoom_image/pinch_zoom_image.dart';
 
-class CameraPage extends MaterialPageRoute<Null> {
-  List<CameraDescription> cameras;
-  final url;
-
-  CameraPage(this.cameras, this.url)
-      : super(builder: (BuildContext context) {
-          return _CameraWidget(cameras, url);
-        });
-
-  static Future startCamera(BuildContext context, String url) async {
-    List<CameraDescription> cameras = await availableCameras();
-    Navigator.of(context).push(CameraPage(cameras, url));
-  }
+Future startCamera(BuildContext context, String url) async {
+  List<CameraDescription> cameras = await availableCameras();
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (BuildContext context) => _CameraWidget(cameras, url),
+  ));
 }
 
 class _CameraWidget extends StatefulWidget {
-  List<CameraDescription> cameras;
+  final List<CameraDescription> cameras;
   final url;
 
   _CameraWidget(this.cameras, this.url);
