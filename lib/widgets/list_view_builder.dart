@@ -30,8 +30,8 @@ class _ListViewBuilderState extends State<ListViewBuilder> {
               Hero(
                 tag: categories[idx].name,
                 child: Container(
-                  height: 70,
-                  width: 120,
+                  height: 72,
+                  width: 140,
                   child: Image.asset(categories[idx].imageUrl),
                 ),
               ),
