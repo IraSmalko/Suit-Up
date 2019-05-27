@@ -1,6 +1,10 @@
 import 'package:suit_up/models/category.dart';
 
 class Repository {
+  static Repository instance = Repository._internal();
+
+  Repository._internal();
+
   final List<Category> categories = <Category>[
     Category("res/images/category_t_shirts.png", "T-shirts"),
     Category("res/images/category_sweaters.png", "Sweaters"),

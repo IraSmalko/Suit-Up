@@ -1,4 +1,11 @@
+import 'dart:io';
+
+import 'package:di_container/di_container.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/models/category.dart';
 
 Future startClothingPage(BuildContext context, Category category) async {
@@ -22,18 +29,38 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
 
   _ClothingWidgetState(this.category);
 
+  File _image;
+  var imagePath;
+  String flutterLogoFileName = "flutter.png";
+
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = dir.path + "/" + "image1.jpg";
+    final newFile = File(pathName);
+    final File newImage = await image.copy(newFile.path);
+
+    SharedPreferences prefs = Injector.get();
+    prefs.setString("image", newImage.path);
+
+    setState(() {
+      _image = newImage;
+    });
+  }
+
   @override
   void initState() {
-    super.initState();
     _scrollController = new ScrollController();
     _scrollController.addListener(() => setState(() {}));
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: new Stack(
+      body: Stack(
         children: <Widget>[
           NestedScrollView(
             controller: _scrollController,
@@ -55,7 +82,27 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
                 ),
               ];
             },
-            body: Text("tefd"),
+            body: Column(
+              children: <Widget>[
+                Center(
+                    child: _image == null
+                        ? Text('No image selected.')
+                        : Image.file(
+                            File(_image.path),
+                            height: 80,
+                            width: 80,
+                          )),
+                Center(child: _image == null ? Text('No image selected.') : Text(_image.path)),
+                Center(
+                    child: imagePath == null
+                        ? Text('No image selected.')
+                        : Image.file(
+                            File(imagePath),
+                            height: 80,
+                            width: 80,
+                          )),
+              ],
+            ),
           ),
           _buildFab(),
         ],
@@ -96,9 +143,12 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
         alignment: Alignment.center,
         child: new FloatingActionButton(
           backgroundColor: Colors.white,
-          onPressed: () => {},
+          onPressed: () {
+            Fluttertoast.showToast(msg: "hi");
+            getImage();
+          },
           child: new Icon(
-            Icons.add,
+            Icons.add_a_photo,
             color: Colors.black,
           ),
         ),

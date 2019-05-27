@@ -1,12 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:di_container/di_container.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
 import 'package:suit_up/widgets/list_view_builder.dart';
 
 import 'models/category.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  runApp(MyApp());
+
+  final x = await SharedPreferences.getInstance();
+  Injector.register(type: Type.singleton, builder: () => x);
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -33,7 +40,7 @@ class _BottomTabbarPage extends StatefulWidget {
 class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerProviderStateMixin {
   TabController _tabController;
 
-  static final List<Category> categories = Repository().categories;
+  static final List<Category> categories = Repository.instance.categories;
 
   var _kTabPages = <Widget>[
     Center(child: ListViewBuilder(categories)),

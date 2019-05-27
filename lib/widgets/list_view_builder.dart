@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:suit_up/models/category.dart';
 
@@ -38,9 +39,19 @@ class _ListViewBuilderState extends State<ListViewBuilder> {
               Spacer(flex: 1),
               Padding(
                 padding: const EdgeInsets.only(right: 16.0),
-                child: Text(
-                  categories[idx].name,
-                  style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic, fontSize: 18),
+                child: Container(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 30.0,
+                      maxWidth: 300.0,
+                      minHeight: 30.0,
+                      maxHeight: 100.0,
+                    ),
+                    child: AutoSizeText(
+                      categories[idx].name,
+                      style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
+                    ),
+                  ),
                 ),
               )
             ],
