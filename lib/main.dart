@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
-import 'package:suit_up/widgets/list_view_builder.dart';
+import 'package:suit_up/widgets/categories_list.dart';
 
 import 'models/category.dart';
 
@@ -44,7 +44,7 @@ class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerP
   static final List<Category> categories = Repository.instance.categories;
 
   var _kTabPages = <Widget>[
-    Center(child: ListViewBuilder(categories)),
+    Center(child: CategoriesList(categories)),
     Center(child: MyHomePage(title: "Suit up")),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),

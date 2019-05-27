@@ -6,8 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/models/category.dart';
+import 'package:suit_up/repository/repository.dart';
 
 import 'image_picker_fab.dart';
+import 'items_list.dart';
 
 Future startClothingPage(BuildContext context, Category category) async {
   Navigator.of(context).push(MaterialPageRoute(
@@ -83,27 +85,7 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
                 ),
               ];
             },
-            body: Column(
-              children: <Widget>[
-                Center(
-                    child: _image == null
-                        ? Text('No image selected.')
-                        : Image.file(
-                            File(_image.path),
-                            height: 80,
-                            width: 80,
-                          )),
-                Center(child: _image == null ? Text('No image selected.') : Text(_image.path)),
-                Center(
-                    child: imagePath == null
-                        ? Text('No image selected.')
-                        : Image.file(
-                            File(imagePath),
-                            height: 80,
-                            width: 80,
-                          )),
-              ],
-            ),
+            body: ItemsList(Repository.instance.dress),
           ),
           _buildFab(),
         ],

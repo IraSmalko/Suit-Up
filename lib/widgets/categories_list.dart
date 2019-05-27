@@ -4,19 +4,19 @@ import 'package:suit_up/models/category.dart';
 
 import 'clothing_page.dart';
 
-class ListViewBuilder extends StatefulWidget {
+class CategoriesList extends StatefulWidget {
   final List<Category> categories;
 
-  ListViewBuilder(this.categories);
+  CategoriesList(this.categories);
 
   @override
-  _ListViewBuilderState createState() => _ListViewBuilderState(categories);
+  _CategoriesListState createState() => _CategoriesListState(categories);
 }
 
-class _ListViewBuilderState extends State<ListViewBuilder> {
+class _CategoriesListState extends State<CategoriesList> {
   final List<Category> categories;
 
-  _ListViewBuilderState(this.categories);
+  _CategoriesListState(this.categories);
 
   @override
   Widget build(BuildContext context) {

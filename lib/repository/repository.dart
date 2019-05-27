@@ -14,4 +14,16 @@ class Repository {
     Category("res/images/category_skirts.png", "Skirts"),
     Category("res/images/category_jackets.png", "Jackets")
   ];
+
+  final List<Category> dress = <Category>[
+    Category("res/images/dress_1.jpg", "T-shirts"),
+    Category("res/images/dress_2.jpg", "Sweaters"),
+    Category("res/images/dress_3.jpg", "Jeans"),
+    Category("res/images/dress_4.jpg", "Trousers"),
+    Category("res/images/dress_5.jpg", "Dress"),
+    Category("res/images/dress_6.jpg", "Dress"),
+    Category("res/images/dress_1.jpg", "T-shirts"),
+    Category("res/images/dress_2.jpg", "Sweaters"),
+    Category("res/images/dress_3.jpg", "Jeans")
+  ];
 }
