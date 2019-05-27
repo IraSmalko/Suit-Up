@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:di_container/di_container.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
 import 'package:suit_up/widgets/list_view_builder.dart';
@@ -161,11 +162,15 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: new Builder(builder: (BuildContext context) {
           return FloatingActionButton(
             elevation: 5,
-            onPressed: () => _incrementCounter(context),
+            onPressed: () => pickImage(ImageSource.camera),
             tooltip: 'Increment',
             child: Icon(Icons.add),
           );
         }));
+  }
+
+  pickImage(ImageSource source) async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
   }
 
   void _showToast(BuildContext co) {

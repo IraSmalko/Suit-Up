@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:di_container/di_container.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/models/category.dart';
+
+import 'image_picker_fab.dart';
 
 Future startClothingPage(BuildContext context, Category category) async {
   Navigator.of(context).push(MaterialPageRoute(
@@ -69,7 +70,7 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
                 SliverAppBar(
                   iconTheme: IconThemeData(color: Colors.black, opacity: 0),
                   backgroundColor: Colors.white,
-                  expandedHeight: 120.0,
+                  expandedHeight: 140.0,
                   floating: true,
                   pinned: false,
                   snap: true,
@@ -139,20 +140,7 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
       top: top,
       right: 16.0,
       child: new Transform(
-        transform: new Matrix4.identity()..scale(scale),
-        alignment: Alignment.center,
-        child: new FloatingActionButton(
-          backgroundColor: Colors.white,
-          onPressed: () {
-            Fluttertoast.showToast(msg: "hi");
-            getImage();
-          },
-          child: new Icon(
-            Icons.add_a_photo,
-            color: Colors.black,
-          ),
-        ),
-      ),
+          transform: new Matrix4.identity()..scale(scale), alignment: Alignment.center, child: ImagePickerFAB()),
     );
   }
 }
