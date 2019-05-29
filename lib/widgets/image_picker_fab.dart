@@ -150,6 +150,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Transform(
+          transformHitTests: true,
           transform: Matrix4.translationValues(
             _translateButton.value * 2.0,
             0.0,
@@ -158,6 +159,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
           child: pickImageFromGallery(),
         ),
         Transform(
+          transformHitTests: true,
           transform: Matrix4.translationValues(
             _translateButton.value,
             0.0,

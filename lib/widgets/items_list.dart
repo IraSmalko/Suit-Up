@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:suit_up/models/category.dart';
-
-import 'clothing_page.dart';
+import 'package:suit_up/widgets/page_views.dart';
 
 class ItemsList extends StatefulWidget {
   final List<Category> categories;
@@ -23,7 +22,7 @@ class _ItemsListState extends State<ItemsList> {
 
     Widget _buildRow(int idx) {
       return GestureDetector(
-        onTap: () => startClothingPage(context, categories[idx]),
+        onTap: () => startPageViews(context),
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: Card(
