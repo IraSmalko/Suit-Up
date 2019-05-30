@@ -21,13 +21,20 @@ class SketcherPage extends StatefulWidget {
 class _SketcherPageState extends State<SketcherPage> {
   final ui.Image data;
   List<Offset> points = <Offset>[];
+  int _cIndex = 0;
+  double sliderValue = 1.0;
+
+  void _incrementTab(index) {
+    setState(() {
+      _cIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final appData = MediaQuery.of(context).size;
     final paddingTop = MediaQuery.of(context).padding.top;
     final Container sketchArea = Container(
-        margin: EdgeInsets.only(bottom: appData.height - appData.width - paddingTop),
         alignment: Alignment.topLeft,
         color: Colors.black,
         child: CustomPaint(
@@ -35,33 +42,68 @@ class _SketcherPageState extends State<SketcherPage> {
         ));
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: null,
       body: Container(
         margin: EdgeInsets.only(top: paddingTop),
-        child: GestureDetector(
-          onPanUpdate: (DragUpdateDetails details) {
-            setState(() {
-              RenderBox box = context.findRenderObject();
-              Offset point = box.globalToLocal(details.globalPosition);
-              point = point.translate(0.0, -(AppBar().preferredSize.height));
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              height: appData.width + paddingTop,
+              child: GestureDetector(
+                onPanUpdate: (DragUpdateDetails details) {
+                  setState(() {
+                    RenderBox box = context.findRenderObject();
+                    Offset point = box.globalToLocal(details.globalPosition);
+                    // point = point.translate(0.0, -(AppBar().preferredSize.height));
 
-              points = List.from(points)..add(point);
-            });
-          },
-          onPanEnd: (DragEndDetails details) {
-            setState(() {
-              points = List.from(points)..add(null);
-            });
-          },
-          child: sketchArea,
+                    points = List.from(points)..add(point);
+                  });
+                },
+                onPanEnd: (DragEndDetails details) {
+                  setState(() {
+                    points = List.from(points)..add(null);
+                  });
+                },
+                child: sketchArea,
+              ),
+            ),
+//            Padding(
+//              padding: const EdgeInsets.all(8.0),
+//              child: Slider(
+//                activeColor: Colors.black,
+//                min: 0.0,
+//                max: 5.0,
+//                divisions: 5,
+//                value: sliderValue,
+//                label: "${sliderValue.round()}",
+//                onChanged: (double value) {
+//                  setState(() => sliderValue = value);
+//                },
+//              ),
+//            ),
+          ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'clear Screen',
-        backgroundColor: Colors.red,
-        child: Icon(Icons.refresh),
-        onPressed: () {
-          setState(() => points.clear());
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        fixedColor: Colors.black,
+        elevation: 5.0,
+        currentIndex: _cIndex,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.zoom_in, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Zoom')),
+          BottomNavigationBarItem(icon: Icon(Icons.crop, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Crop')),
+          BottomNavigationBarItem(icon: Icon(Icons.brush, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Erase')),
+          BottomNavigationBarItem(icon: Icon(Icons.refresh, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Rotate'))
+        ],
+        onTap: (index) {
+          _incrementTab(index);
+          if (index == 3) {
+            setState(() => points.clear());
+          }
         },
       ),
     );
