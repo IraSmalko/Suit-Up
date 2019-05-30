@@ -1,8 +1,12 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:suit_up/widgets/sketcher_page.dart';
 
 class ImagePickerFAB extends StatefulWidget {
   @override
@@ -22,11 +26,28 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
 
   File _image;
 
-  pickImage(ImageSource source) async {
-    var image = await ImagePicker.pickImage(source: source);
+  pickImage(ImageSource source, BuildContext context) async {
+    final appWidth = MediaQuery.of(context).size.width;
+    var image = await ImagePicker.pickImage(source: source, maxHeight: appWidth, maxWidth: appWidth);
+
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = dir.path + "/" + "image1.jpg";
+    final newFile = File(pathName);
+    final File newImage = await image.copy(newFile.path);
+
+    _loadImage(pathName).then((_) => startSketcherPage(context, _.image));
     setState(() {
       _image = image;
     });
+  }
+
+  Future<ui.FrameInfo> _loadImage(String pathName) async {
+    var q = await rootBundle.load(pathName);
+    if (q == null) throw 'Unable to read data';
+    var codec = await ui.instantiateImageCodec(q.buffer.asUint8List());
+
+    var frame = await codec.getNextFrame();
+    return frame;
   }
 
   @override
@@ -96,11 +117,11 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     isOpened = !isOpened;
   }
 
-  Widget pickImageFromGallery() {
+  Widget pickImageFromGallery(BuildContext context) {
     return Container(
       child: FloatingActionButton(
         onPressed: () {
-          pickImage(ImageSource.gallery);
+          pickImage(ImageSource.gallery, context);
         },
         backgroundColor: Colors.white,
         tooltip: "pickImageFromGallery",
@@ -113,11 +134,11 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     );
   }
 
-  Widget pickImageFromCamera() {
+  Widget pickImageFromCamera(BuildContext context) {
     return Container(
       child: FloatingActionButton(
         onPressed: () {
-          pickImage(ImageSource.camera);
+          pickImage(ImageSource.camera, context);
         },
         backgroundColor: Colors.white,
         tooltip: "pickImageFromCamera",
@@ -156,7 +177,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
             0.0,
             0.0,
           ),
-          child: pickImageFromGallery(),
+          child: pickImageFromGallery(context),
         ),
         Transform(
           transformHitTests: true,
@@ -165,7 +186,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
             0.0,
             0.0,
           ),
-          child: pickImageFromCamera(),
+          child: pickImageFromCamera(context),
         ),
         toggle(),
       ],

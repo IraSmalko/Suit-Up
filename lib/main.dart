@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
 import 'package:suit_up/widgets/categories_list.dart';
-import 'package:suit_up/widgets/page_views.dart';
 
 import 'models/category.dart';
 
@@ -164,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: new Builder(builder: (BuildContext context) {
           return FloatingActionButton(
             elevation: 5,
-            onPressed: () => startPageViews(context),
+            //  onPressed: () => startSketcherPage(context),
             tooltip: 'Increment',
             child: Icon(Icons.add),
           );
