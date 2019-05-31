@@ -52,6 +52,15 @@ class _SketcherPageState extends State<SketcherPage> {
   int _cIndex = 0;
   double sliderValue = 1.0;
 
+  Offset _startingFocalPoint;
+
+  Offset _previousOffset;
+  Offset _offset = Offset.zero;
+
+  double _previousZoom;
+  double _zoom = 1.0;
+  bool _scaleEnabled = true;
+
   GlobalKey _globalKey = new GlobalKey();
 
   _capturePng(BuildContext context) async {
@@ -82,6 +91,30 @@ class _SketcherPageState extends State<SketcherPage> {
     setState(() => _cIndex = index);
   }
 
+  void _handleScaleStart(ScaleStartDetails details) {
+    setState(() {
+      _startingFocalPoint = details.focalPoint;
+      _previousOffset = _offset;
+      _previousZoom = _zoom;
+    });
+  }
+
+  void _handleScaleUpdate(ScaleUpdateDetails details) {
+    setState(() {
+      _zoom = _previousZoom * details.scale;
+
+      final Offset normalizedOffset = (_startingFocalPoint - _previousOffset) / _previousZoom;
+      _offset = details.focalPoint - normalizedOffset * _zoom;
+    });
+  }
+
+  void _handleScaleReset() {
+    setState(() {
+      _zoom = 1.0;
+      _offset = Offset.zero;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appData = MediaQuery.of(context).size;
@@ -90,7 +123,7 @@ class _SketcherPageState extends State<SketcherPage> {
         alignment: Alignment.topLeft,
         color: Colors.transparent,
         child: CustomPaint(
-          painter: Sketcher(cropPoints, erasePoints, data, appData.width, _cIndex, sliderValue),
+          painter: Sketcher(_zoom, _offset, cropPoints, erasePoints, data, appData.width, _cIndex, sliderValue),
         ));
 
     return Scaffold(
@@ -105,29 +138,31 @@ class _SketcherPageState extends State<SketcherPage> {
             Container(
               height: appData.width + paddingTop,
               child: GestureDetector(
-                onPanDown: (DragDownDetails details) {
-                  setState(() {
-                    print("TTT  onPanDown");
-                    if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
-                  });
-                },
-                onPanUpdate: (DragUpdateDetails details) {
-                  setState(() {
-                    print("TTT  onPanUpdate");
-                    RenderBox box = context.findRenderObject();
-                    Offset point = box.globalToLocal(details.globalPosition);
-                    // point = point.translate(0.0, -(AppBar().preferredSize.height));
-                    if (_cIndex == 1)
-                      cropPoints = List.from(cropPoints)..add(point);
-                    else if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
-                  });
-                },
-                onPanEnd: (DragEndDetails details) {
-                  setState(() {
-                    if (_cIndex == 1) cropPoints = List.from(cropPoints)..add(null);
-                  });
-                },
-                child: RepaintBoundary(key: _globalKey, child: sketchArea),
+                onScaleStart: _scaleEnabled ? _handleScaleStart : null,
+                onScaleUpdate: _scaleEnabled ? _handleScaleUpdate : null,
+                child: GestureDetector(
+                  onPanDown: (DragDownDetails details) {
+                    setState(() {
+                      if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
+                    });
+                  },
+                  onPanUpdate: (DragUpdateDetails details) {
+                    setState(() {
+//                      RenderBox box = context.findRenderObject();
+//                      Offset point = box.globalToLocal(details.globalPosition);
+                      // point = point.translate(0.0, -(AppBar().preferredSize.height));
+                      if (_cIndex == 1)
+                        cropPoints = List.from(cropPoints)..add(details.globalPosition);
+                      else if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
+                    });
+                  },
+                  onPanEnd: (DragEndDetails details) {
+                    setState(() {
+                      if (_cIndex == 1) cropPoints = List.from(cropPoints)..add(null);
+                    });
+                  },
+                  child: RepaintBoundary(key: _globalKey, child: sketchArea),
+                ),
               ),
             ),
             Padding(
@@ -162,13 +197,17 @@ class _SketcherPageState extends State<SketcherPage> {
         onTap: (index) {
           _incrementTab(index);
           if (0 == index) {
+            _scaleEnabled = true;
             _capturePng(context);
           } else if (3 == index) {
             setState(() {
+              _scaleEnabled = false;
               cropPoints.clear();
               erasePoints.clear();
+              _handleScaleReset();
             });
-          }
+          } else
+            _scaleEnabled = false;
         },
       ),
     );
@@ -184,8 +223,19 @@ class Sketcher extends CustomPainter {
   final double appWidth;
   final double paintWidth;
   final int buttonIndex;
+  final double zoom;
+  final Offset offset;
 
-  Sketcher(this.cropPoints, this.erasePoints, this.image, this.appWidth, this.buttonIndex, this.paintWidth);
+  Sketcher(
+    this.zoom,
+    this.offset,
+    this.cropPoints,
+    this.erasePoints,
+    this.image,
+    this.appWidth,
+    this.buttonIndex,
+    this.paintWidth,
+  );
 
   @override
   bool shouldRepaint(Sketcher oldDelegate) {
@@ -212,7 +262,7 @@ class Sketcher extends CustomPainter {
     canvas.drawImageNine(
       image,
       Rect.fromCenter(center: Offset(0, 0), width: appWidth, height: appWidth),
-      Rect.fromLTWH(16, 16, appWidth - 32, appWidth - 32),
+      Rect.fromLTWH(16 * zoom + offset.dx, 16 * zoom + offset.dy, (appWidth - 32) * zoom, (appWidth - 32) * zoom),
       Paint(),
     );
 
