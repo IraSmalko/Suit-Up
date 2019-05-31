@@ -136,7 +136,8 @@ class _SketcherPageState extends State<SketcherPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Container(
-              height: appData.width + paddingTop,
+              color: Colors.black,
+              height: appData.height - appData.width / 2,
               child: GestureDetector(
                 onScaleStart: _scaleEnabled ? _handleScaleStart : null,
                 onScaleUpdate: _scaleEnabled ? _handleScaleUpdate : null,
@@ -239,6 +240,14 @@ class Sketcher extends CustomPainter {
   final double zoom;
   final Offset offset;
 
+  var cropPath = Path();
+  Rect dstRect = Rect.fromCenter(center: Offset(0, 0), width: 0, height: 0);
+  Paint paintCropLine = Paint()..blendMode = BlendMode.clear;
+  Paint paintImage = Paint()..filterQuality = FilterQuality.medium;
+  Paint erasePaint = Paint()
+    ..color = Colors.white
+    ..blendMode = BlendMode.clear;
+
   Sketcher(
     this.zoom,
     this.offset,
@@ -258,10 +267,7 @@ class Sketcher extends CustomPainter {
 
   @override
   paint(Canvas canvas, Size size) {
-    canvas.clipRect(Rect.fromLTWH(0, 0, appWidth, appWidth));
-
-    var cropPath = Path();
-    Paint paintCropLine = Paint()..blendMode = BlendMode.clear;
+    var height = image.height * appWidth / image.width;
 
     for (int i = 0; i < cropPoints.length; i++) {
       if (cropPoints[i] == null) {
@@ -274,27 +280,19 @@ class Sketcher extends CustomPainter {
 
     canvas.drawImageNine(
       image,
-      Rect.fromCenter(center: Offset(0, 0), width: appWidth, height: appWidth),
-      Rect.fromLTWH(16 * zoom + offset.dx, 16 * zoom + offset.dy, (appWidth - 32) * zoom, (appWidth - 32) * zoom),
-      Paint(),
+      dstRect,
+      Rect.fromLTWH(24 * zoom + offset.dx, 24 * zoom + offset.dy, (appWidth - 48) * zoom, (height - 48) * zoom),
+      paintImage,
     );
 
-    erase(canvas);
+    for (int i = 0; i < erasePoints.length; i++) {
+      canvas.drawOval(Rect.fromCircle(center: erasePoints[i], radius: paintWidth), erasePaint);
+    }
 
     for (int i = 0; i < cropPoints.length; i++) {
       if (cropPoints[i] != null && cropPoints[i + 1] != null) {
         canvas.drawLine(cropPoints[i], cropPoints[i + 1], paintCropLine);
       }
-    }
-  }
-
-  erase(Canvas canvas) {
-    Paint erasePaint = Paint()
-      ..color = Colors.white
-      ..blendMode = BlendMode.clear;
-
-    for (int i = 0; i < erasePoints.length; i++) {
-      canvas.drawOval(Rect.fromCircle(center: erasePoints[i], radius: paintWidth), erasePaint);
     }
   }
 }

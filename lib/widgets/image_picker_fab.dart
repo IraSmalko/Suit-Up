@@ -27,8 +27,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
   File _image;
 
   pickImage(ImageSource source, BuildContext context) async {
-    final appWidth = MediaQuery.of(context).size.width;
-    var image = await ImagePicker.pickImage(source: source, maxHeight: appWidth, maxWidth: appWidth);
+    var image = await ImagePicker.pickImage(source: source);
 
     Directory dir = await getApplicationDocumentsDirectory();
     String pathName = dir.path + "/" + "image1.jpg";

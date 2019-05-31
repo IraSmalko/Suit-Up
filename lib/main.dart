@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.black,
           bottomAppBarTheme: BottomAppBarTheme(color: Colors.white)),
       home: Container(
-        padding: const EdgeInsets.all(8.0),
         child: _BottomTabbarPage(),
       ),
     );
