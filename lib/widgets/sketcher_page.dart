@@ -192,22 +192,35 @@ class _SketcherPageState extends State<SketcherPage> {
           BottomNavigationBarItem(icon: Icon(Icons.zoom_in, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Zoom')),
           BottomNavigationBarItem(icon: Icon(Icons.crop, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Crop')),
           BottomNavigationBarItem(icon: Icon(Icons.brush, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Erase')),
-          BottomNavigationBarItem(icon: Icon(Icons.refresh, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Rotate'))
+          BottomNavigationBarItem(
+              icon: Icon(Icons.restore, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Restore')),
+          BottomNavigationBarItem(icon: Icon(Icons.done, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Done')),
+          //   BottomNavigationBarItem(icon: Icon(Icons.refresh, color: Color.fromARGB(255, 0, 0, 0)), title: Text('Rotate'))
         ],
         onTap: (index) {
           _incrementTab(index);
-          if (0 == index) {
-            _scaleEnabled = true;
-            _capturePng(context);
-          } else if (3 == index) {
-            setState(() {
+          switch (index) {
+            case 0:
+              _scaleEnabled = true;
+              break;
+            case 1:
               _scaleEnabled = false;
-              cropPoints.clear();
-              erasePoints.clear();
-              _handleScaleReset();
-            });
-          } else
-            _scaleEnabled = false;
+              break;
+            case 2:
+              _scaleEnabled = false;
+              break;
+            case 3:
+              setState(() {
+                _scaleEnabled = false;
+                cropPoints.clear();
+                erasePoints.clear();
+                _handleScaleReset();
+              });
+              break;
+            case 4:
+              _capturePng(context);
+              break;
+          }
         },
       ),
     );
