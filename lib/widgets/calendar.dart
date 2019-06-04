@@ -79,7 +79,8 @@ class _CalendarPageState extends State<CalendarPage> {
                           child: Text(
                             _calendarItems[index - 7].day.toString(),
                             style: TextStyle(
-                              color: _calendarItems[index - 7].date.month != _dateTime.month ? Colors.grey : Colors.black,
+                              color:
+                                  _calendarItems[index - 7].date.month != _dateTime.month ? Colors.grey : Colors.black,
                             ),
                           ),
                         ),
