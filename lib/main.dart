@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
+import 'package:suit_up/widgets/calendar.dart';
 import 'package:suit_up/widgets/categories_list.dart';
 
 import 'models/category.dart';
@@ -46,7 +47,7 @@ class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerP
     Center(child: CategoriesList(categories)),
     Center(child: MyHomePage(title: "Suit up")),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
-    Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
+    Center(child: CalendarPage()),
   ];
   static const _kTabs = <Tab>[
     Tab(icon: Icon(Icons.thumb_up, size: 24), text: 'Сlothing'),
