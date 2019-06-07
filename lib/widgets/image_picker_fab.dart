@@ -14,19 +14,18 @@ class ImagePickerFAB extends StatefulWidget {
 }
 
 class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProviderStateMixin {
+  final Curve _curve = Curves.easeOut;
+  final double _fabHeight = 56.0;
+  final double _padding = 8.0;
+
   bool isOpened = false;
   AnimationController _animationController;
   Animation<Color> _buttonColor;
   Animation<Color> _iconColor;
   Animation<IconData> _animateIcon;
   Animation<double> _translateButton;
-  Curve _curve = Curves.easeOut;
-  double _fabHeight = 56.0;
-  double _padding = 8.0;
 
-  File _image;
-
-  pickImage(ImageSource source, BuildContext context) async {
+  void _pickImage(ImageSource source, BuildContext context) async {
     var image = await ImagePicker.pickImage(source: source);
 
     Directory dir = await getApplicationDocumentsDirectory();
@@ -35,9 +34,6 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     final File newImage = await image.copy(newFile.path);
 
     _loadImage(pathName).then((_) => startSketcherPage(context, _.image));
-    setState(() {
-      _image = image;
-    });
   }
 
   Future<ui.FrameInfo> _loadImage(String pathName) async {
@@ -45,8 +41,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     if (q == null) throw 'Unable to read data';
     var codec = await ui.instantiateImageCodec(q.buffer.asUint8List());
 
-    var frame = await codec.getNextFrame();
-    return frame;
+    return await codec.getNextFrame();
   }
 
   @override
@@ -107,7 +102,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     super.dispose();
   }
 
-  animate() {
+  void _animate() {
     if (!isOpened) {
       _animationController.forward();
     } else {
@@ -116,11 +111,11 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     isOpened = !isOpened;
   }
 
-  Widget pickImageFromGallery(BuildContext context) {
+  Widget _pickImageFromGallery(BuildContext context) {
     return Container(
       child: FloatingActionButton(
         onPressed: () {
-          pickImage(ImageSource.gallery, context);
+          _pickImage(ImageSource.gallery, context);
         },
         backgroundColor: Colors.white,
         tooltip: "pickImageFromGallery",
@@ -133,11 +128,11 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     );
   }
 
-  Widget pickImageFromCamera(BuildContext context) {
+  Widget _pickImageFromCamera(BuildContext context) {
     return Container(
       child: FloatingActionButton(
         onPressed: () {
-          pickImage(ImageSource.camera, context);
+          _pickImage(ImageSource.camera, context);
         },
         backgroundColor: Colors.white,
         tooltip: "pickImageFromCamera",
@@ -150,11 +145,11 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
     );
   }
 
-  Widget toggle() {
+  Widget _toggle() {
     return Container(
       child: FloatingActionButton(
         backgroundColor: _buttonColor.value,
-        onPressed: animate,
+        onPressed: _animate,
         tooltip: 'Toggle',
         child: Icon(
           _animateIcon.value,
@@ -176,7 +171,7 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
             0.0,
             0.0,
           ),
-          child: pickImageFromGallery(context),
+          child: _pickImageFromGallery(context),
         ),
         Transform(
           transformHitTests: true,
@@ -185,9 +180,9 @@ class _ImagePickerFABState extends State<ImagePickerFAB> with SingleTickerProvid
             0.0,
             0.0,
           ),
-          child: pickImageFromCamera(context),
+          child: _pickImageFromCamera(context),
         ),
-        toggle(),
+        _toggle(),
       ],
     );
   }

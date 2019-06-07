@@ -15,16 +15,16 @@ class PageViews extends StatefulWidget {
 }
 
 class _PageViewsState extends State<PageViews> {
-  PageController controller;
-  var currentPageValue = 0.0;
-  static final List<Category> items = Repository.instance.dress;
+  PageController _controller;
+  double _currentPageValue = 0.0;
+  static final List<Category> _items = Repository.instance.dress;
 
   @override
   void initState() {
-    controller = PageController()
+    _controller = PageController()
       ..addListener(() {
         setState(() {
-          currentPageValue = controller.page;
+          _currentPageValue = _controller.page;
         });
       });
     super.initState();
@@ -34,41 +34,44 @@ class _PageViewsState extends State<PageViews> {
   Widget build(BuildContext context) {
     var data = MediaQuery.of(context);
     var screenWidth = data.size.width - data.padding.horizontal;
-    data.size;
+
     return Scaffold(
       primary: true,
       appBar: new AppBar(
         iconTheme: IconThemeData(color: Colors.black, opacity: 1),
         backgroundColor: Colors.white,
-        title: Text(
-          "Suit up",
-          style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
-        ),
+        title: Text("Suit up", style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic)),
       ),
       body: PageView.builder(
-        controller: controller,
+        controller: _controller,
         itemBuilder: (context, position) {
           return Transform(
             transform: Matrix4.identity()
-              ..rotateY(currentPageValue - position)
-              ..rotateZ(currentPageValue - position),
+              ..rotateY(_currentPageValue - position)
+              ..rotateZ(_currentPageValue - position),
             child: Container(
               child: Column(
                 children: <Widget>[
                   Container(
                     width: screenWidth,
-                    child: Image.asset(items[position].imageUrl),
+                    child: Image.asset(_items[position].imageUrl),
+                  ),
+                  Spacer(
+                    flex: 1,
                   ),
                   Text(
-                    "Page",
-                    style: TextStyle(color: Colors.white, fontSize: 22.0),
+                    "Some description",
+                    style: TextStyle(color: Colors.black, fontSize: 22.0),
+                  ),
+                  Spacer(
+                    flex: 1,
                   ),
                 ],
               ),
             ),
           );
         },
-        itemCount: items.length,
+        itemCount: _items.length,
       ),
     );
   }

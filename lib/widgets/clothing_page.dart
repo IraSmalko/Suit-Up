@@ -18,25 +18,21 @@ Future startClothingPage(BuildContext context, Category category) async {
 }
 
 class _ClothingWidget extends StatefulWidget {
-  final category;
+  final _category;
 
-  _ClothingWidget(this.category);
+  _ClothingWidget(this._category);
 
   @override
-  _ClothingWidgetState createState() => _ClothingWidgetState(category);
+  _ClothingWidgetState createState() => _ClothingWidgetState(_category);
 }
 
 class _ClothingWidgetState extends State<_ClothingWidget> {
   ScrollController _scrollController;
-  final category;
+  final _category;
 
-  _ClothingWidgetState(this.category);
+  _ClothingWidgetState(this._category);
 
-  File _image;
-  var imagePath;
-  String flutterLogoFileName = "flutter.png";
-
-  Future getImage() async {
+  Future _getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     Directory dir = await getApplicationDocumentsDirectory();
@@ -46,10 +42,6 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
 
     SharedPreferences prefs = Injector.get();
     prefs.setString("image", newImage.path);
-
-    setState(() {
-      _image = newImage;
-    });
   }
 
   @override
@@ -78,8 +70,8 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
                   snap: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Hero(
-                      tag: category.name,
-                      child: Image.asset(category.imageUrl, fit: BoxFit.cover),
+                      tag: _category.name,
+                      child: Image.asset(_category.imageUrl, fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -109,20 +101,22 @@ class _ClothingWidgetState extends State<_ClothingWidget> {
     if (_scrollController.hasClients) {
       double offset = _scrollController.offset;
       top -= offset;
-      if (offset < defaultTopMargin - scaleStart) {
+      if (offset < defaultTopMargin - scaleStart)
         scale = 1.0;
-      } else if (offset < defaultTopMargin - scaleEnd) {
+      else if (offset < defaultTopMargin - scaleEnd)
         scale = (defaultTopMargin - scaleEnd - offset) / scaleEnd;
-      } else {
+      else
         scale = 0.0;
-      }
     }
 
-    return new Positioned(
+    return Positioned(
       top: top,
       right: 16.0,
-      child: new Transform(
-          transform: new Matrix4.identity()..scale(scale), alignment: Alignment.center, child: ImagePickerFAB()),
+      child: Transform(
+        transform: Matrix4.identity()..scale(scale),
+        alignment: Alignment.center,
+        child: ImagePickerFAB(),
+      ),
     );
   }
 }

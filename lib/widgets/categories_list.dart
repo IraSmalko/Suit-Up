@@ -5,35 +5,35 @@ import 'package:suit_up/models/category.dart';
 import 'clothing_page.dart';
 
 class CategoriesList extends StatefulWidget {
-  final List<Category> categories;
+  final List<Category> _categories;
 
-  CategoriesList(this.categories);
+  CategoriesList(this._categories);
 
   @override
-  _CategoriesListState createState() => _CategoriesListState(categories);
+  _CategoriesListState createState() => _CategoriesListState(_categories);
 }
 
 class _CategoriesListState extends State<CategoriesList> {
-  final List<Category> categories;
+  final List<Category> _categories;
 
-  _CategoriesListState(this.categories);
+  _CategoriesListState(this._categories);
 
   @override
   Widget build(BuildContext context) {
-    final numItems = categories.length;
+    final numItems = _categories.length;
 
     Widget _buildRow(int idx) {
       return GestureDetector(
-        onTap: () => startClothingPage(context, categories[idx]),
+        onTap: () => startClothingPage(context, _categories[idx]),
         child: Card(
           child: Row(
             children: <Widget>[
               Hero(
-                tag: categories[idx].name,
+                tag: _categories[idx].name,
                 child: Container(
                   height: 72,
                   width: 140,
-                  child: Image.asset(categories[idx].imageUrl),
+                  child: Image.asset(_categories[idx].imageUrl),
                 ),
               ),
               Spacer(flex: 1),
@@ -48,7 +48,7 @@ class _CategoriesListState extends State<CategoriesList> {
                       maxHeight: 100.0,
                     ),
                     child: AutoSizeText(
-                      categories[idx].name,
+                      _categories[idx].name,
                       style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
                     ),
                   ),

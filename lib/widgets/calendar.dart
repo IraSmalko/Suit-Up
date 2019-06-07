@@ -36,6 +36,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       primary: true,
+      backgroundColor: Colors.white,
       body: CalendarCarousel(
         selectedDateTime: _currentDate,
         daysHaveCircularBorder: true,

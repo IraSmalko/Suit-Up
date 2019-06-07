@@ -1,17 +1,12 @@
-import 'package:di_container/di_container.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suit_up/repository/repository.dart';
 import 'package:suit_up/widgets/calendar.dart';
 import 'package:suit_up/widgets/categories_list.dart';
 
 import 'models/category.dart';
 
-void main() async {
+void main() {
   runApp(MyApp());
-
-  final x = await SharedPreferences.getInstance();
-  Injector.register(type: Type.singleton, builder: () => x);
 }
 
 class MyApp extends StatelessWidget {
@@ -38,10 +33,10 @@ class _BottomTabbarPage extends StatefulWidget {
 class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerProviderStateMixin {
   TabController _tabController;
 
-  static final List<Category> categories = Repository.instance.categories;
+  static final List<Category> _categories = Repository.instance.categories;
 
   var _kTabPages = <Widget>[
-    Center(child: CategoriesList(categories)),
+    Center(child: CategoriesList(_categories)),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
     Center(child: Icon(Icons.forum, size: 64.0, color: Colors.blue)),
     Center(child: CalendarPage()),

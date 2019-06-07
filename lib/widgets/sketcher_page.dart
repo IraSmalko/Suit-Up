@@ -7,27 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 
-startSPage(BuildContext context, Image path) {
-  Navigator.of(context).push(MaterialPageRoute(
-    builder: (BuildContext context) => _SPage(path),
-  ));
-}
-
-class _SPage extends StatelessWidget {
-  final Image data;
-
-  _SPage(this.data);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.pink,
-      child: Center(
-        child: data,
-      ),
-    );
-  }
-}
+import 'item_page.dart';
 
 startSketcherPage(BuildContext context, ui.Image data) {
   Navigator.of(context).push(MaterialPageRoute(
@@ -36,34 +16,30 @@ startSketcherPage(BuildContext context, ui.Image data) {
 }
 
 class SketcherPage extends StatefulWidget {
-  ui.Image data;
+  final ui.Image _data;
+
+  SketcherPage(this._data);
 
   @override
-  _SketcherPageState createState() => _SketcherPageState(data);
-
-  SketcherPage(this.data);
+  _SketcherPageState createState() => _SketcherPageState(_data);
 }
 
 class _SketcherPageState extends State<SketcherPage> {
-  final ui.Image data;
-  List<Offset> points = <Offset>[];
-  List<Offset> cropPoints = <Offset>[];
-  List<Offset> erasePoints = <Offset>[];
-  int _cIndex = 0;
-  double sliderValue = 1.0;
+  final ui.Image _data;
+  final GlobalKey _globalKey = GlobalKey();
+  List<Offset> _cropPoints = <Offset>[];
+  List<Offset> _erasePoints = <Offset>[];
 
   Offset _startingFocalPoint;
-
   Offset _previousOffset;
   Offset _offset = Offset.zero;
-
   double _previousZoom;
   double _zoom = 1.0;
   bool _scaleEnabled = true;
+  int _cIndex = 0;
+  double _sliderValue = 1.0;
 
-  GlobalKey _globalKey = new GlobalKey();
-
-  _capturePng(BuildContext context) async {
+  void _capturePng(BuildContext context) async {
     try {
       print('inside');
       RenderRepaintBoundary boundary = _globalKey.currentContext.findRenderObject();
@@ -81,7 +57,7 @@ class _SketcherPageState extends State<SketcherPage> {
       String pathName = dir.path + "/" + "image2.png";
       final newFile = File(pathName);
       //  final File newImage = await file.copy(newFile.path);
-      startSPage(context, im);
+      startItemPage(context, im);
     } catch (e) {
       print(e);
     }
@@ -123,7 +99,7 @@ class _SketcherPageState extends State<SketcherPage> {
         alignment: Alignment.topLeft,
         color: Colors.transparent,
         child: CustomPaint(
-          painter: Sketcher(_zoom, _offset, cropPoints, erasePoints, data, appData.width, _cIndex, sliderValue),
+          painter: Sketcher(_zoom, _offset, _cropPoints, _erasePoints, _data, appData.width, _sliderValue),
         ));
 
     return Scaffold(
@@ -144,22 +120,19 @@ class _SketcherPageState extends State<SketcherPage> {
                 child: GestureDetector(
                   onPanDown: (DragDownDetails details) {
                     setState(() {
-                      if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
+                      if (_cIndex == 2) _erasePoints = List.from(_erasePoints)..add(details.globalPosition);
                     });
                   },
                   onPanUpdate: (DragUpdateDetails details) {
                     setState(() {
-//                      RenderBox box = context.findRenderObject();
-//                      Offset point = box.globalToLocal(details.globalPosition);
-                      // point = point.translate(0.0, -(AppBar().preferredSize.height));
                       if (_cIndex == 1)
-                        cropPoints = List.from(cropPoints)..add(details.globalPosition);
-                      else if (_cIndex == 2) erasePoints = List.from(erasePoints)..add(details.globalPosition);
+                        _cropPoints = List.from(_cropPoints)..add(details.globalPosition);
+                      else if (_cIndex == 2) _erasePoints = List.from(_erasePoints)..add(details.globalPosition);
                     });
                   },
                   onPanEnd: (DragEndDetails details) {
                     setState(() {
-                      if (_cIndex == 1) cropPoints = List.from(cropPoints)..add(null);
+                      if (_cIndex == 1) _cropPoints = List.from(_cropPoints)..add(null);
                     });
                   },
                   child: RepaintBoundary(key: _globalKey, child: sketchArea),
@@ -173,10 +146,10 @@ class _SketcherPageState extends State<SketcherPage> {
                 min: 0.0,
                 max: 15.0,
                 divisions: 15,
-                value: sliderValue,
-                label: "${sliderValue.round()}",
+                value: _sliderValue,
+                label: "${_sliderValue.round()}",
                 onChanged: (double value) {
-                  setState(() => sliderValue = value);
+                  setState(() => _sliderValue = value);
                 },
               ),
             ),
@@ -213,8 +186,8 @@ class _SketcherPageState extends State<SketcherPage> {
             case 3:
               setState(() {
                 _scaleEnabled = false;
-                cropPoints.clear();
-                erasePoints.clear();
+                _cropPoints.clear();
+                _erasePoints.clear();
                 _handleScaleReset();
               });
               break;
@@ -227,36 +200,34 @@ class _SketcherPageState extends State<SketcherPage> {
     );
   }
 
-  _SketcherPageState(this.data);
+  _SketcherPageState(this._data);
 }
 
 class Sketcher extends CustomPainter {
-  ui.Image image;
-  List<Offset> cropPoints;
-  final List<Offset> erasePoints;
-  final double appWidth;
-  final double paintWidth;
-  final int buttonIndex;
-  final double zoom;
-  final Offset offset;
+  final ui.Image _image;
+  final List<Offset> _cropPoints;
+  final List<Offset> _erasePoints;
+  final double _appWidth;
+  final double _paintWidth;
+  final double _zoom;
+  final Offset _offset;
 
-  var cropPath = Path();
-  Rect dstRect = Rect.fromCenter(center: Offset(0, 0), width: 0, height: 0);
-  Paint paintCropLine = Paint()..blendMode = BlendMode.clear;
-  Paint paintImage = Paint()..filterQuality = FilterQuality.medium;
-  Paint erasePaint = Paint()
+  final Path cropPath = Path();
+  final Rect dstRect = Rect.fromCenter(center: Offset(0, 0), width: 0, height: 0);
+  final Paint paintCropLine = Paint()..blendMode = BlendMode.clear;
+  final Paint paintImage = Paint()..filterQuality = FilterQuality.medium;
+  final Paint erasePaint = Paint()
     ..color = Colors.white
     ..blendMode = BlendMode.clear;
 
   Sketcher(
-    this.zoom,
-    this.offset,
-    this.cropPoints,
-    this.erasePoints,
-    this.image,
-    this.appWidth,
-    this.buttonIndex,
-    this.paintWidth,
+    this._zoom,
+    this._offset,
+    this._cropPoints,
+    this._erasePoints,
+    this._image,
+    this._appWidth,
+    this._paintWidth,
   );
 
   @override
@@ -267,31 +238,31 @@ class Sketcher extends CustomPainter {
 
   @override
   paint(Canvas canvas, Size size) {
-    var height = image.height * appWidth / image.width;
+    var height = _image.height * _appWidth / _image.width;
 
-    for (int i = 0; i < cropPoints.length; i++) {
-      if (cropPoints[i] == null) {
-        cropPoints.removeLast();
-        cropPath.addPolygon(cropPoints, true);
+    for (int i = 0; i < _cropPoints.length; i++) {
+      if (_cropPoints[i] == null) {
+        _cropPoints.removeLast();
+        cropPath.addPolygon(_cropPoints, true);
         canvas.clipPath(cropPath);
-        cropPoints.add(null);
+        _cropPoints.add(null);
       }
     }
 
     canvas.drawImageNine(
-      image,
+      _image,
       dstRect,
-      Rect.fromLTWH(24 * zoom + offset.dx, 24 * zoom + offset.dy, (appWidth - 48) * zoom, (height - 48) * zoom),
+      Rect.fromLTWH(24 * _zoom + _offset.dx, 24 * _zoom + _offset.dy, (_appWidth - 48) * _zoom, (height - 48) * _zoom),
       paintImage,
     );
 
-    for (int i = 0; i < erasePoints.length; i++) {
-      canvas.drawOval(Rect.fromCircle(center: erasePoints[i], radius: paintWidth), erasePaint);
+    for (int i = 0; i < _erasePoints.length; i++) {
+      canvas.drawOval(Rect.fromCircle(center: _erasePoints[i], radius: _paintWidth), erasePaint);
     }
 
-    for (int i = 0; i < cropPoints.length; i++) {
-      if (cropPoints[i] != null && cropPoints[i + 1] != null) {
-        canvas.drawLine(cropPoints[i], cropPoints[i + 1], paintCropLine);
+    for (int i = 0; i < _cropPoints.length; i++) {
+      if (_cropPoints[i] != null && _cropPoints[i + 1] != null) {
+        canvas.drawLine(_cropPoints[i], _cropPoints[i + 1], paintCropLine);
       }
     }
   }

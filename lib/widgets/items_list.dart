@@ -12,13 +12,13 @@ class ItemsList extends StatefulWidget {
 }
 
 class _ItemsListState extends State<ItemsList> {
-  final List<Category> categories;
+  final List<Category> _categories;
 
-  _ItemsListState(this.categories);
+  _ItemsListState(this._categories);
 
   @override
   Widget build(BuildContext context) {
-    final numItems = categories.length;
+    final numItems = _categories.length;
 
     Widget _buildRow(int idx) {
       return GestureDetector(
@@ -30,7 +30,7 @@ class _ItemsListState extends State<ItemsList> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
             child: Column(
               children: <Widget>[
-                Image.asset(categories[idx].imageUrl, fit: BoxFit.fill),
+                Image.asset(_categories[idx].imageUrl, fit: BoxFit.fill),
               ],
             ),
           ),

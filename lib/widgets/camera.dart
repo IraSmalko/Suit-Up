@@ -10,27 +10,27 @@ Future startCamera(BuildContext context, String url) async {
 }
 
 class _CameraWidget extends StatefulWidget {
-  final List<CameraDescription> cameras;
-  final url;
+  final List<CameraDescription> _cameras;
+  final _url;
 
-  _CameraWidget(this.cameras, this.url);
+  _CameraWidget(this._cameras, this._url);
 
   @override
-  _CameraWidgetState createState() => _CameraWidgetState(cameras, url);
+  _CameraWidgetState createState() => _CameraWidgetState(_cameras, _url);
 }
 
 class _CameraWidgetState extends State<_CameraWidget> {
-  List<CameraDescription> cameras;
-  CameraController controller;
-  final url;
+  CameraController _controller;
+  final List<CameraDescription> _cameras;
+  final _url;
 
-  _CameraWidgetState(this.cameras, this.url);
+  _CameraWidgetState(this._cameras, this._url);
 
   @override
   void initState() {
     super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.medium);
-    controller.initialize().then((_) {
+    _controller = CameraController(_cameras[0], ResolutionPreset.medium);
+    _controller.initialize().then((_) {
       if (!mounted) {
         return;
       }
@@ -40,22 +40,22 @@ class _CameraWidgetState extends State<_CameraWidget> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
+    if (!_controller.value.isInitialized) {
       return Container();
     }
     return AspectRatio(
-        aspectRatio: controller.value.aspectRatio,
+        aspectRatio: _controller.value.aspectRatio,
         child: Stack(
           children: <Widget>[
-            CameraPreview(controller),
+            CameraPreview(_controller),
             PinchZoomImage(
-              image: Image.network(url),
+              image: Image.network(_url),
               zoomedBackgroundColor: Color.fromRGBO(240, 240, 240, 1.0),
               hideStatusBarWhileZooming: true,
             )
