@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:suit_up/models/category.dart';
 import 'package:suit_up/repository/repository.dart';
 
+import 'camera.dart';
+
 startPageViews(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute(
     builder: (BuildContext context) => PageViews(),
@@ -49,24 +51,34 @@ class _PageViewsState extends State<PageViews> {
             transform: Matrix4.identity()
               ..rotateY(_currentPageValue - position)
               ..rotateZ(_currentPageValue - position),
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    width: screenWidth,
-                    child: Image.asset(_items[position].imageUrl),
-                  ),
-                  Spacer(
-                    flex: 1,
-                  ),
-                  Text(
-                    "Some description",
-                    style: TextStyle(color: Colors.black, fontSize: 22.0),
-                  ),
-                  Spacer(
-                    flex: 1,
-                  ),
-                ],
+            child: Scaffold(
+              body: Container(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: screenWidth,
+                      child: Image.asset(_items[position].imageUrl),
+                    ),
+                    Spacer(
+                      flex: 1,
+                    ),
+                    Text(
+                      "Some description",
+                      style: TextStyle(color: Colors.black, fontSize: 22.0),
+                    ),
+                    Spacer(
+                      flex: 1,
+                    ),
+                  ],
+                ),
+              ),
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.visibility,
+                  color: Colors.black,
+                ),
+                onPressed: () => startCamera(context, _items[position].imageUrl),
               ),
             ),
           );
