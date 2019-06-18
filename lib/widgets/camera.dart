@@ -2,31 +2,16 @@ import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:suit_up/util/image_util.dart';
+import 'package:suit_up/widgets/zoom_painter.dart';
 
 Future startCamera(BuildContext context, String url) async {
   List<CameraDescription> cameras = await availableCameras();
-  _loadImage(url).then((val) {
+  loadImage(url).then((val) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) => _CameraWidget(cameras, val.image),
     ));
   });
-}
-//Future startZoom(BuildContext context, String url) async {
-//  List<CameraDescription> cameras = await availableCameras();
-//  _loadImage(url).then((val) {
-//    Navigator.of(context).push(MaterialPageRoute(
-//      builder: (BuildContext context) => ZoomImageView( val.image),
-//    ));
-//  });
-//}
-
-Future<ui.FrameInfo> _loadImage(String pathName) async {
-  var q = await rootBundle.load(pathName);
-  if (q == null) throw 'Unable to read data';
-  var codec = await ui.instantiateImageCodec(q.buffer.asUint8List());
-
-  return await codec.getNextFrame();
 }
 
 class _CameraWidget extends StatefulWidget {
@@ -43,6 +28,12 @@ class _CameraWidgetState extends State<_CameraWidget> {
   CameraController _controller;
   final List<CameraDescription> _cameras;
   final ui.Image _image;
+
+  Offset _startingFocalPoint;
+  Offset _previousOffset;
+  Offset _offset = Offset.zero;
+  double _previousZoom;
+  double _zoom = 1.0;
 
   _CameraWidgetState(this._cameras, this._image);
 
@@ -67,7 +58,6 @@ class _CameraWidgetState extends State<_CameraWidget> {
   @override
   Widget build(BuildContext context) {
     final appData = MediaQuery.of(context).size;
-    print("QQQ build $_zoom");
     if (!_controller.value.isInitialized) {
       return Container();
     }
@@ -86,29 +76,7 @@ class _CameraWidgetState extends State<_CameraWidget> {
             )));
   }
 
-  Offset _startingFocalPoint;
-  Offset _previousOffset;
-  Offset _offset = Offset.zero;
-  double _previousZoom;
-  double _zoom = 1.0;
-  // final ui.Image _image;
-
-//    @override
-//    Widget build(BuildContext context) {
-//      final appData = MediaQuery.of(context).size;
-//      print("QQQ build $_zoom");
-//
-//      return GestureDetector(
-//        onScaleStart: _handleScaleStart,
-//        onScaleUpdate: _handleScaleUpdate,
-//        child: CustomPaint(
-//          painter: ZoomPainter(_zoom, _offset, _image, appData.width),
-//        ),
-//      );
-//    }
-
-  void _handleScaleStart(ScaleStartDetails details) {
-    print("QQQ handleScaleStart $_zoom");
+  _handleScaleStart(ScaleStartDetails details) {
     setState(() {
       _startingFocalPoint = details.focalPoint;
       _previousOffset = _offset;
@@ -116,8 +84,7 @@ class _CameraWidgetState extends State<_CameraWidget> {
     });
   }
 
-  void _handleScaleUpdate(ScaleUpdateDetails details) {
-    print("QQQ handleScaleUpdate $_zoom");
+  _handleScaleUpdate(ScaleUpdateDetails details) {
     setState(() {
       _zoom = _previousZoom * details.scale;
 
@@ -126,41 +93,10 @@ class _CameraWidgetState extends State<_CameraWidget> {
     });
   }
 
-  void _handleScaleReset() {
+  _handleScaleReset() {
     setState(() {
       _zoom = 1.0;
       _offset = Offset.zero;
     });
-  }
-}
-
-class ZoomPainter extends CustomPainter {
-  final ui.Image _image;
-  final double _zoom;
-  final double _appWidth;
-  final Offset _offset;
-
-  final Rect dstRect = Rect.fromCenter(center: Offset(0, 0), width: 0, height: 0);
-  final Paint paintImage = Paint()..filterQuality = FilterQuality.medium;
-
-  ZoomPainter(this._zoom, this._offset, this._image, this._appWidth);
-
-  @override
-  bool shouldRepaint(ZoomPainter oldDelegate) {
-    return true;
-    // return oldDelegate._zoom != _zoom && oldDelegate._offset != _offset && oldDelegate._image != _image;
-  }
-
-  @override
-  paint(Canvas canvas, Size size) {
-    var height = _image.height * _appWidth / _image.width;
-    print("QQQ zoom $_zoom");
-
-    canvas.drawImageNine(
-      _image,
-      dstRect,
-      Rect.fromLTWH(24 * _zoom + _offset.dx, 24 * _zoom + _offset.dy, (_appWidth - 48) * _zoom, (height - 48) * _zoom),
-      paintImage,
-    );
   }
 }
