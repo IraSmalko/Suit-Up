@@ -5,6 +5,7 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
 import 'package:suit_up/models/category.dart';
 import 'package:suit_up/repository/repository.dart';
 
+import 'camera.dart';
 import 'items_list.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -67,6 +68,9 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        startCamera(context, "res/images/dress_6.jpg");
+      }),
     );
   }
 
