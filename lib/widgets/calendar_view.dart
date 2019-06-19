@@ -18,7 +18,9 @@ class _CalendarViewState extends State<CalendarView> {
   final int _numWeekDays = 7;
   final _calendarItems = <CalendarItem>[];
   final Function(double height) onHeightChanged;
+  final DateTime _today = DateTime.now();
   DateTime _dateTime = DateTime.now();
+  DateTime _selectedDay = DateTime.now();
   DateFormat _localeDate;
   double _headerHeight = 48;
   double _calendarViewHeight;
@@ -42,7 +44,7 @@ class _CalendarViewState extends State<CalendarView> {
   _addDaysOfCurrentMonth(List<CalendarItem> list) {
     final _daysOfMonth = _getDaysOfMonth(_dateTime);
     for (int i = 1; i <= _daysOfMonth; i++) {
-      if (i == 22) {
+      if (i == 19) {
         list.add(CalendarItem(DateTime(_dateTime.year, _dateTime.month, i), i, "res/images/dress_3.jpg"));
       } else
         list.add(CalendarItem(DateTime(_dateTime.year, _dateTime.month, i), i, ""));
@@ -72,6 +74,10 @@ class _CalendarViewState extends State<CalendarView> {
 
   DateTime _previousMonth(DateTime dateTime) {
     return dateTime.month == 1 ? DateTime(dateTime.year - 1, 12) : DateTime(dateTime.year, dateTime.month - 1);
+  }
+
+  bool _isSameDay(DateTime dateTime1, DateTime dateTime2) {
+    return dateTime1.year == dateTime2.year && dateTime1.month == dateTime2.month && dateTime1.day == dateTime2.day;
   }
 
   @override
@@ -122,22 +128,38 @@ class _CalendarViewState extends State<CalendarView> {
       }));
 
       list.addAll(_calendarItems.map((CalendarItem item) {
-        return Card(
-          elevation: 0.0,
-          child: Stack(
-            children: <Widget>[
-              Center(
-                child: Text(
-                  item.day.toString(),
-                  style: TextStyle(
-                    color: item.date.month != _dateTime.month ? Colors.grey : Colors.black,
+        Color calendarItemTextColor = item.date.month != _dateTime.month
+            ? Colors.grey
+            : _isSameDay(item.date, _today) ? Colors.blue : Colors.black;
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedDay = item.date;
+            });
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(color: _isSameDay(item.date, _selectedDay) ? Colors.black : Colors.transparent),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                )),
+            elevation: 0.0,
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    item.day.toString(),
+                    style: TextStyle(
+                      color: calendarItemTextColor,
+                    ),
                   ),
                 ),
-              ),
-              item.imageUrl.isNotEmpty
-                  ? Align(alignment: Alignment.bottomRight, child: Icon(Icons.star, size: 14, color: Colors.yellow))
-                  : Container()
-            ],
+                item.imageUrl.isNotEmpty
+                    ? Align(alignment: Alignment.bottomRight, child: Icon(Icons.star, size: 14, color: Colors.yellow))
+                    : Container()
+              ],
+            ),
           ),
         );
       }));
