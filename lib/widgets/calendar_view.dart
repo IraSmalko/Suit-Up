@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:suit_up/models/calendar_item.dart';
 
 class CalendarView extends StatefulWidget {
@@ -17,8 +19,10 @@ class _CalendarViewState extends State<CalendarView> {
   final _calendarItems = <CalendarItem>[];
   final Function(double height) onHeightChanged;
   DateTime _dateTime = DateTime.now();
+  DateFormat _localeDate;
   double _headerHeight = 48;
   double _calendarViewHeight;
+  String locale = "en";
 
   _CalendarViewState(this.onHeightChanged);
 
@@ -66,6 +70,13 @@ class _CalendarViewState extends State<CalendarView> {
 
   DateTime _previousMonth(DateTime dateTime) {
     return dateTime.month == 1 ? DateTime(dateTime.year - 1, 12) : DateTime(dateTime.year, dateTime.month - 1);
+  }
+
+  @override
+  initState() {
+    super.initState();
+    initializeDateFormatting();
+    _localeDate = DateFormat.yMMM(locale);
   }
 
   @override
@@ -144,6 +155,15 @@ class _CalendarViewState extends State<CalendarView> {
                         _dateTime = _previousMonth(_dateTime);
                       });
                     }),
+                Text(
+                  "${_localeDate.format(this._dateTime)}",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 IconButton(
                     icon: Icon(Icons.chevron_right, color: Colors.black, size: 24.0),
                     onPressed: () {
