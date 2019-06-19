@@ -75,7 +75,7 @@ class _BottomTabbarPageState extends State<_BottomTabbarPage> with SingleTickerP
             labelStyle: TextStyle(color: Colors.black, fontStyle: FontStyle.italic, fontSize: 10),
             indicatorColor: Colors.black,
             labelColor: Colors.black,
-            unselectedLabelColor: Colors.black12,
+            unselectedLabelColor: Colors.grey,
             tabs: _kTabs,
             controller: _tabController,
           ),

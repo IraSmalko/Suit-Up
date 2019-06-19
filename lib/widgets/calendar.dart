@@ -5,7 +5,7 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
 import 'package:suit_up/models/category.dart';
 import 'package:suit_up/repository/repository.dart';
 
-import 'camera.dart';
+import 'calendar_view.dart';
 import 'items_list.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -18,6 +18,7 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   ScrollController _scrollController;
   static final List<Category> _category = Repository.instance.categories;
+  double _calendarHeight = 320;
 
   DateTime _currentDate = DateTime.now();
 
@@ -48,29 +49,47 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     CalendarCarousel calendar = buildCalendar();
-    print("WWW ${calendar}");
-
     return Scaffold(
       appBar: null,
       body: Stack(
         children: <Widget>[
           NestedScrollView(
-            scrollDirection: Axis.vertical,
             controller: _scrollController,
             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
-                SliverList(delegate: SliverChildBuilderDelegate((ctx, int) {
-                  return int == 0 ? calendar : null;
-                }))
+                SliverAppBar(
+                  iconTheme: IconThemeData(color: Colors.black, opacity: 0),
+                  backgroundColor: Colors.white,
+                  expandedHeight: _calendarHeight,
+                  elevation: 5,
+                  floating: false,
+                  pinned: false,
+                  snap: false,
+                  forceElevated: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: CalendarView(
+                      onHeightChanged: (height) {
+                        setState(() {
+                          _calendarHeight = height;
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ];
             },
             body: ItemsList(Repository.instance.dress),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        startCamera(context, "res/images/dress_6.jpg");
-      }),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.visibility,
+          color: Colors.black,
+        ),
+        onPressed: () => {},
+      ),
     );
   }
 
