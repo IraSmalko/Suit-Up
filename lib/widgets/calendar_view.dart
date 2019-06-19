@@ -23,6 +23,8 @@ class _CalendarViewState extends State<CalendarView> {
   double _headerHeight = 48;
   double _calendarViewHeight;
   String locale = "en";
+  PageController _controller;
+  double _currentPageValue = 0.0;
 
   _CalendarViewState(this.onHeightChanged);
 
@@ -77,6 +79,13 @@ class _CalendarViewState extends State<CalendarView> {
     super.initState();
     initializeDateFormatting();
     _localeDate = DateFormat.yMMM(locale);
+
+    _controller = PageController()
+      ..addListener(() {
+        setState(() {
+          _currentPageValue = _controller.page;
+        });
+      });
   }
 
   @override
@@ -135,56 +144,76 @@ class _CalendarViewState extends State<CalendarView> {
       return list;
     }
 
-    return Column(
-      children: <Widget>[
-        Container(
-          height: _headerHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                IconButton(
-                    icon: Icon(
-                      Icons.chevron_left,
-                      color: Colors.black,
-                      size: 24.0,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _dateTime = _previousMonth(_dateTime);
-                      });
-                    }),
-                Text(
-                  "${_localeDate.format(this._dateTime)}",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w500,
+    return PageView.builder(
+      onPageChanged: (i) {
+        if (i > _currentPageValue)
+          setState(() {
+            _currentPageValue = i.toDouble();
+            _dateTime = _nextMonth(_dateTime);
+          });
+        else
+          setState(() {
+            _currentPageValue = i.toDouble();
+            _dateTime = _previousMonth(_dateTime);
+          });
+      },
+      controller: _controller,
+      itemBuilder: (context, position) {
+        return Transform(
+          transform: Matrix4.identity()..rotateX(_currentPageValue - position),
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: _headerHeight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      IconButton(
+                          icon: Icon(
+                            Icons.chevron_left,
+                            color: Colors.black,
+                            size: 24.0,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _dateTime = _previousMonth(_dateTime);
+                            });
+                          }),
+                      Text(
+                        "${_localeDate.format(this._dateTime)}",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.chevron_right, color: Colors.black, size: 24.0),
+                          onPressed: () {
+                            setState(() {
+                              _dateTime = _nextMonth(_dateTime);
+                            });
+                          }),
+                    ],
                   ),
                 ),
-                IconButton(
-                    icon: Icon(Icons.chevron_right, color: Colors.black, size: 24.0),
-                    onPressed: () {
-                      setState(() {
-                        _dateTime = _nextMonth(_dateTime);
-                      });
-                    }),
-              ],
-            ),
+              ),
+              Container(
+                height: _calendarViewHeight - _headerHeight,
+                child: GridView.count(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  childAspectRatio: (itemWidth / itemHeight),
+                  children: buildListOfWidgets(),
+                  crossAxisCount: _numWeekDays,
+                ),
+              ),
+            ],
           ),
-        ),
-        Container(
-          height: _calendarViewHeight - _headerHeight,
-          child: GridView.count(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            childAspectRatio: (itemWidth / itemHeight),
-            children: buildListOfWidgets(),
-            crossAxisCount: _numWeekDays,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
