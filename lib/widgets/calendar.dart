@@ -4,8 +4,8 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
     show CalendarCarousel, EventList, WeekdayFormat;
 import 'package:suit_up/models/category.dart';
 import 'package:suit_up/repository/repository.dart';
+import 'package:suit_up/widgets/calendar_view/calendar_view.dart';
 
-import 'calendar_view.dart';
 import 'items_list.dart';
 
 class CalendarPage extends StatefulWidget {
